@@ -64,10 +64,18 @@ async function run() {
         })
 
         //get post api
-        app.get('/posts', verifyJWT, async (req, res) => {
+        app.get('/posts', async (req, res) => {
             const query = {};
             const posts = await postsCollection.find(query).toArray();
             res.send(posts);
+        })
+
+        //get post by id
+        app.get('/posts/:id', verifyJWT, async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const post = await postsCollection.findOne(query);
+            res.send(post);
         })
 
         //Generate a jwt token
