@@ -52,6 +52,14 @@ async function run() {
             res.send(result);
         })
 
+        //getUsers by email
+        app.get('/users', verifyJWT, async (req, res) => {
+            const email = req.query.email;
+            const query = { email: email };
+            const users = await usersCollection.find(query).toArray();
+            res.send(users);
+        })
+
         //add post to database
         app.post('/posts', verifyJWT, async (req, res) => {
             const post = req.body;
@@ -153,13 +161,6 @@ async function run() {
             //send confirmation email
             sendEmail(booking);
             res.send(result);
-        })
-
-        //getUsers
-        app.get('/users', async (req, res) => {
-            const query = {}
-            const users = await usersCollection.find(query).toArray();
-            res.send(users);
         })
 
         //updateUsersRole
