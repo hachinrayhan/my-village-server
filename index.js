@@ -59,6 +59,13 @@ async function run() {
             res.send(result);
         })
 
+        //get post api
+        app.get('/posts', verifyJWT, async (req, res) => {
+            const query = {};
+            const posts = await postsCollection.find(query).toArray();
+            res.send(posts);
+        })
+
         //Generate a jwt token
         app.get('/jwt', async (req, res) => {
             const email = req.query.email;
@@ -97,15 +104,6 @@ async function run() {
             const query = {};
             const result = await optionsCollection.find(query).project({ name: 1 }).toArray();
             res.send(result);
-        })
-
-
-
-        //find all the added doctors
-        app.get('/doctors', verifyJWT, async (req, res) => {
-            const query = {};
-            const doctors = await doctorsCollection.find(query).toArray();
-            res.send(doctors);
         })
 
         //delete a doctor
