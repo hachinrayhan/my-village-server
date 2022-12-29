@@ -90,7 +90,7 @@ async function run() {
 run().catch(err => console.log(err))
 
 app.get('/', async (req, res) => {
-    res.send('doctors portal is running');
+    res.send('my village server is running');
 })
 
 app.listen(port, () => {
