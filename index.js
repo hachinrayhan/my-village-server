@@ -40,6 +40,37 @@ async function run() {
         const doctorsCollection = client.db('doctorsPortal').collection('doctors');
         const paymentsCollection = client.db('doctorsPortal').collection('payments');
 
+        //Create user
+        app.post('/users', async (req, res) => {
+            const user = req.body;
+            const query = { email: user.email };
+            const alreadyExist = await usersCollection.findOne(query);
+            if (alreadyExist) {
+                return;
+            }
+            const result = await usersCollection.insertOne(user);
+            res.send(result);
+        })
+
+        //add post to database
+        app.post('/posts', verifyJWT, async (req, res) => {
+            const post = req.body;
+            const result = await postsCollection.insertOne(post);
+            res.send(result);
+        })
+
+        //Generate a jwt token
+        app.get('/jwt', async (req, res) => {
+            const email = req.query.email;
+            const query = { email: email };
+            const user = await usersCollection.findOne(query);
+            if (user) {
+                const token = jwt.sign({ email }, process.env.ACCESS_TOKEN, { expiresIn: '7d' });
+                return res.send({ accessToken: token })
+            }
+            res.status(403).send({ accessToken: '' })
+        })
+
         app.get('/appointmentOptions', async (req, res) => {
             const date = req.query.date;
             const query = {};
@@ -68,12 +99,7 @@ async function run() {
             res.send(result);
         })
 
-        //add post to database
-        app.post('/posts', verifyJWT, async (req, res) => {
-            const post = req.body;
-            const result = await postsCollection.insertOne(post);
-            res.send(result);
-        })
+
 
         //find all the added doctors
         app.get('/doctors', verifyJWT, async (req, res) => {
@@ -128,30 +154,6 @@ async function run() {
             const result = await bookingsCollection.insertOne(booking);
             //send confirmation email
             sendEmail(booking);
-            res.send(result);
-        })
-
-        //Generate a jwt token
-        app.get('/jwt', async (req, res) => {
-            const email = req.query.email;
-            const query = { email: email };
-            const user = await usersCollection.findOne(query);
-            if (user) {
-                const token = jwt.sign({ email }, process.env.ACCESS_TOKEN, { expiresIn: '7d' });
-                return res.send({ accessToken: token })
-            }
-            res.status(403).send({ accessToken: '' })
-        })
-
-        //Create user
-        app.post('/users', async (req, res) => {
-            const user = req.body;
-            const query = { email: user.email };
-            const alreadyExist = await usersCollection.findOne(query);
-            if (alreadyExist) {
-                return;
-            }
-            const result = await usersCollection.insertOne(user);
             res.send(result);
         })
 
