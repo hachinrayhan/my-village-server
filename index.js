@@ -56,6 +56,26 @@ async function run() {
             res.send(users);
         })
 
+        //update users info
+        app.patch('/users/:id', verifyJWT, async (req, res) => {
+            const id = req.params.id;
+            const data = req.body;
+            const { name, email, institution, address } = data;
+            // console.log(data);
+            const filter = { _id: ObjectId(id) }
+            const options = { upsert: true };
+            const updatedDoc = {
+                $set: {
+                    name,
+                    email,
+                    institution,
+                    address
+                }
+            };
+            const result = await usersCollection.updateOne(filter, updatedDoc, options);
+            res.send(result);
+        })
+
         //add post to database
         app.post('/posts', verifyJWT, async (req, res) => {
             const post = req.body;
